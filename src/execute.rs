@@ -3,9 +3,41 @@ use cosmwasm_std::{
 };
 
 use crate::contract::DENOM;
-use crate::msg::{AddMsg};
+use crate::hasher::{generate_proof_as_string};
+use crate::msg::{AddMsg, ProveMsg};
 use crate::state::{CONFIG, Secret, SECRETS};
 use crate::error::ContractError;
+
+pub fn execute_prove(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+    msg: ProveMsg,
+) -> Result<Response, ContractError> {
+    let config = CONFIG.load(deps.storage)?;
+    if config.owner != info.sender.clone() {
+        return Err(ContractError::Unauthorized {});
+    }
+
+    let hash_puzzle = SECRETS.load(deps.storage, &msg.id)?;
+    if msg.depth.clone() >= hash_puzzle.depth.clone() {
+        return Err(ContractError::InvalidInput {});
+    }
+
+    let depth: u32 = hash_puzzle.depth - msg.depth;
+    let res: String = generate_proof_as_string(depth, msg.proof.clone()).unwrap();
+    dbg!(res.clone());
+    //here
+    if res != hash_puzzle.secret {
+        return Err(ContractError::Unauthorized {});
+    }
+
+    Ok(Response::new()
+        .add_attribute("action", "execute_prove")
+        .add_attribute("secret", hash_puzzle.id)
+        .add_attribute("prover", info.sender.to_string())
+        .add_attribute("proof", msg.proof))
+}
 
 pub fn execute_add_secret(
     deps: DepsMut,

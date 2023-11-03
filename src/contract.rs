@@ -9,8 +9,7 @@ use crate::error::ContractError;
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::{Config, CONFIG};
 use crate::execute::{
-    execute_add_secret, 
-    // execute_prove
+    execute_add_secret, execute_prove,
 };
 use crate::query::{query_secret_ids, query_details};
 
@@ -52,7 +51,7 @@ pub fn execute(
 ) -> Result<Response, ContractError> {
     match msg {
         ExecuteMsg::AddSecret(msg) => execute_add_secret(deps, env, info, msg),
-        // ExecuteMsg::SubmitProof(msg) => execute_prove(deps, env, info, msg),
+        ExecuteMsg::SubmitProof(msg) => execute_prove(deps, env, info, msg),
     }
 }
 
