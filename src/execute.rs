@@ -1,5 +1,5 @@
 use cosmwasm_std::{
-    Coin, DepsMut, Env, MessageInfo, Response,
+    BankMsg, Coin, CosmosMsg, DepsMut, Env, MessageInfo, Response,
 };
 
 use crate::contract::DENOM;
@@ -27,11 +27,28 @@ pub fn execute_prove(
         return Err(ContractError::Unauthorized {});
     }
 
-    Ok(Response::new()
+    let mut resp = Response::new()
         .add_attribute("action", "execute_prove")
         .add_attribute("secret", hash_puzzle.id)
         .add_attribute("prover", info.sender.to_string())
-        .add_attribute("proof", msg.proof))
+        .add_attribute("proof", msg.proof);
+
+    // Release rewards (if any)
+    let rewards = hash_puzzle.rewards;
+    if let Some(rewards) = rewards {
+        let rewards_msg = BankMsg::Send {
+            to_address: info.sender.into(),
+            amount: ([Coin {
+                denom: DENOM.into(),
+                amount: rewards,
+            }])
+            .to_vec(),
+        };
+        let bank_transfer: CosmosMsg = cosmwasm_std::CosmosMsg::Bank(rewards_msg);
+        resp = resp.clone().add_message(bank_transfer);
+    }
+
+    Ok(resp)
 }
 
 pub fn execute_add_secret(
