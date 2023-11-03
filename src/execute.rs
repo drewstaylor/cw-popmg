@@ -15,9 +15,12 @@ pub fn execute_prove(
     msg: ProveMsg,
 ) -> Result<Response, ContractError> {
     // Load hash puzzle
-    let hash_puzzle = SECRETS.load(deps.storage, &msg.id)?;
+    let mut hash_puzzle = SECRETS.load(deps.storage, &msg.id)?;
     if msg.depth >= hash_puzzle.depth {
         return Err(ContractError::InvalidInput {});
+    }
+    if hash_puzzle.claimed {
+        return Err(ContractError::Claimed {});
     }
 
     // Verify proof
@@ -26,6 +29,12 @@ pub fn execute_prove(
     if res != hash_puzzle.secret {
         return Err(ContractError::Unauthorized {});
     }
+
+    // Clean up storage (hash_puzzle is solved)
+    // Remove legacy secret and re-save
+    hash_puzzle.claimed = true;
+    SECRETS.remove(deps.storage, &msg.id);
+    SECRETS.save(deps.storage, &msg.id, &hash_puzzle)?;
 
     let mut resp = Response::new()
         .add_attribute("action", "execute_prove")
@@ -75,6 +84,7 @@ pub fn execute_add_secret(
         secret: msg.secret,
         depth: msg.depth,
         rewards: msg.rewards,
+        claimed: false,
     };
     SECRETS.update(deps.storage, &msg.id, |existing| match existing {
         None => Ok(secret.clone()),

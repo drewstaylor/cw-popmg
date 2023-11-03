@@ -13,6 +13,18 @@
         }
       },
       "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "submit_proof"
+      ],
+      "properties": {
+        "submit_proof": {
+          "$ref": "#/definitions/ProveMsg"
+        }
+      },
+      "additionalProperties": false
     }
   ],
   "definitions": {
@@ -43,6 +55,27 @@
           ]
         },
         "secret": {
+          "type": "string"
+        }
+      }
+    },
+    "ProveMsg": {
+      "type": "object",
+      "required": [
+        "depth",
+        "id",
+        "proof"
+      ],
+      "properties": {
+        "depth": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0.0
+        },
+        "id": {
+          "type": "string"
+        },
+        "proof": {
           "type": "string"
         }
       }
