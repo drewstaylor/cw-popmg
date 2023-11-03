@@ -14,20 +14,21 @@ pub fn execute_prove(
     info: MessageInfo,
     msg: ProveMsg,
 ) -> Result<Response, ContractError> {
+    // Creator cannot rug rewards
     let config = CONFIG.load(deps.storage)?;
     if config.owner != info.sender.clone() {
         return Err(ContractError::Unauthorized {});
     }
 
+    // Load hash puzzle
     let hash_puzzle = SECRETS.load(deps.storage, &msg.id)?;
     if msg.depth.clone() >= hash_puzzle.depth.clone() {
         return Err(ContractError::InvalidInput {});
     }
 
+    // Verify proof
     let depth: u32 = hash_puzzle.depth - msg.depth;
     let res: String = generate_proof_as_string(depth, msg.proof.clone()).unwrap();
-    // dbg!(res.clone());
-    //here
     if res != hash_puzzle.secret {
         return Err(ContractError::Unauthorized {});
     }
