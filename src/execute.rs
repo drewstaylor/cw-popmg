@@ -14,15 +14,9 @@ pub fn execute_prove(
     info: MessageInfo,
     msg: ProveMsg,
 ) -> Result<Response, ContractError> {
-    // Creator cannot rug rewards
-    let config = CONFIG.load(deps.storage)?;
-    if config.owner != info.sender.clone() {
-        return Err(ContractError::Unauthorized {});
-    }
-
     // Load hash puzzle
     let hash_puzzle = SECRETS.load(deps.storage, &msg.id)?;
-    if msg.depth.clone() >= hash_puzzle.depth.clone() {
+    if msg.depth >= hash_puzzle.depth {
         return Err(ContractError::InvalidInput {});
     }
 
@@ -55,7 +49,7 @@ pub fn execute_add_secret(
     // Tx must cover rewards payment
     let required_payment = Coin {
         denom: DENOM.to_string(),
-        amount: msg.rewards.clone().unwrap(),
+        amount: msg.rewards.unwrap(),
     };
     check_sent_required_payment_exact(&info.funds, Some(required_payment))?;
 

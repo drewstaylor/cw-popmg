@@ -21,8 +21,7 @@ pub fn generate_proof_as_string(
             let mut blake = Blake2b::new(32);
             blake.update(h.res.as_bytes());
             // Finalized
-            let res = blake.finalize();
-            h.res = res.clone();
+            h.res = blake.finalize();
             h.n += 1;
             // Result
             recur(h)
