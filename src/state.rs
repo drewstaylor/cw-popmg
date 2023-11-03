@@ -24,6 +24,7 @@ pub struct Secret {
     pub secret: String,
     pub depth: u32,
     pub rewards: Option<Uint128>,
+    pub claimed: bool,
 }
 
 pub fn all_secret_ids<'a>(

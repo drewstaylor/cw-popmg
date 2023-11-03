@@ -11,7 +11,7 @@ pub struct InstantiateMsg {
 #[serde(rename_all = "snake_case")]
 pub enum ExecuteMsg {
     AddSecret(AddMsg),
-    // SubmitProof(ProveMsg),
+    SubmitProof(ProveMsg),
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]

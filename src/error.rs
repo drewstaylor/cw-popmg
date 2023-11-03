@@ -14,4 +14,7 @@ pub enum ContractError {
 
     #[error("Must send exactly the required funds")]
     ExactFunds {},
+
+    #[error("Hash puzzle already solved, nothing to claim")]
+    Claimed {},
 }
