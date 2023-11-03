@@ -26,7 +26,7 @@ pub fn execute_prove(
 
     let depth: u32 = hash_puzzle.depth - msg.depth;
     let res: String = generate_proof_as_string(depth, msg.proof.clone()).unwrap();
-    dbg!(res.clone());
+    // dbg!(res.clone());
     //here
     if res != hash_puzzle.secret {
         return Err(ContractError::Unauthorized {});
