@@ -2,10 +2,16 @@ use cosmwasm_std::StdError;
 use blake2_rfc::blake2b::{Blake2b, Blake2bResult};
 use hex::{encode as hex_encode, decode as hex_decode};
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Hash {
     pub n: u32, 
     pub res: Blake2bResult,
+}
+
+#[derive(Clone, Debug)]
+pub struct Proof {
+    pub depth: u32,
+    pub hash: String,
 }
 
 pub fn generate_proof_as_string(
@@ -34,6 +40,19 @@ pub fn generate_proof_as_string(
     Ok(res)
 }
 
+pub fn valid_proof(
+    proof: Proof,
+    pubkey: Proof,
+) -> bool {
+    if proof.depth >= pubkey.depth {
+        return false;
+    }
+    let depth: u32 = pubkey.depth - proof.depth;
+    let res: String = generate_proof_as_string(depth, proof.hash).unwrap();
+
+    res == pubkey.hash
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -57,6 +76,49 @@ mod tests {
         let expected_hash_result = "afbda72bc5ca82bc61d800fcc8fdfa4f059d95e58879795863b34525ded88fce";
         let res: String = generate_proof_as_string(depth, proof.to_string()).unwrap();
         assert_eq!(res, expected_hash_result.to_string());
+    }
+
+    #[test]
+    fn validate_proof() {
+        // Proof to be validated
+        let proof = Proof {
+            depth: 1_u32,
+            hash: "6dca8d85358b735f7b0fb4031fa2ba3be75cc4fea9648accd0cfb747092dced7".to_string(),
+        };
+        // Public Secret
+        let pubkey = Proof {
+            depth: 2_u32,
+            hash: "df69b9d584c7594c819796d31b8c9b174a3c2f45f3a1e9f3443ce4831584c074".to_string(),
+        };
+
+        // Correct proof must be valid
+        let is_valid = valid_proof(proof, pubkey.clone());
+        assert!(is_valid);
+
+        // Using an incorrect proof must be invalid
+        let invalid_proof = Proof {
+            depth: 1_u32,
+            hash: "282903d2e04faa9978a1f370c4f17e220536fe580dd4162e68e2c39b5f34de48".to_string(),
+        };
+        let is_valid = valid_proof(invalid_proof, pubkey);
+        assert!(!is_valid);
+
+        // Chain size must not impact proof validity
+        // Long and short evidence chains must be provable
+        let proof_long = Proof {
+            depth: 1_u32, // Evidence chain size: 1000
+            hash: "28d9a5b289fbbac7a8f94fbc6c0952f890e247537008d905a49ce22ff2b607e0".to_string(),
+        };
+        let proof_short = Proof {
+            depth: 950_u32, // Evidence chain size: 51
+            hash: "88a9caab9d9aa32089584df6e193dd3dc22147498e0dc73d5a3c5c471892b92c".to_string(),
+        };
+        let pubkey = Proof {
+            depth: 1001_u32,
+            hash: "afbda72bc5ca82bc61d800fcc8fdfa4f059d95e58879795863b34525ded88fce".to_string(),
+        };
+        let is_valid = valid_proof(proof_long, pubkey.clone());
+        let is_valid = valid_proof(proof_short, pubkey);
     }
 
     #[test]
