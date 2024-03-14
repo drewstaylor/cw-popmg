@@ -42,17 +42,19 @@ mod tests {
     fn hash_proof() {
         // Depth of 1
         let chain_size: u32 = 2;
-        let depth: u32 = chain_size - 1;
+        let proof_index: u32 = 1;
         let proof = "6dca8d85358b735f7b0fb4031fa2ba3be75cc4fea9648accd0cfb747092dced7";
+        let depth: u32 = chain_size - proof_index;
         let expected_hash_result = "df69b9d584c7594c819796d31b8c9b174a3c2f45f3a1e9f3443ce4831584c074";
         let res: String = generate_proof_as_string(depth, proof.to_string()).unwrap();
         assert_eq!(res, expected_hash_result.to_string());
 
         // Depth of 1000
-        let chain_size: u32 = 1000;
-        let depth: u32 = chain_size - 1;
+        let chain_size: u32 = 1001;
+        let proof_index: u32 = 1;
         let proof = "28d9a5b289fbbac7a8f94fbc6c0952f890e247537008d905a49ce22ff2b607e0";
-        let expected_hash_result = "6c41476aa9a032e1c7d465151bc2546ddcc052b4f70aabc8e3389083aa10eaae";
+        let depth: u32 = chain_size - proof_index;
+        let expected_hash_result = "afbda72bc5ca82bc61d800fcc8fdfa4f059d95e58879795863b34525ded88fce";
         let res: String = generate_proof_as_string(depth, proof.to_string()).unwrap();
         assert_eq!(res, expected_hash_result.to_string());
     }
