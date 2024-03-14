@@ -58,7 +58,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn hash_proof() {
+    fn generate_proof() {
         // Depth of 1
         let chain_size: u32 = 2;
         let proof_index: u32 = 1;
@@ -124,7 +124,7 @@ mod tests {
     }
 
     #[test]
-    fn large_chain() {
+    fn generate_large_chain() {
         let size: u32 = 10000;
         let hex = "6dca8d85358b735f7b0fb4031fa2ba3be75cc4fea9648accd0cfb747092dced7";
         let res: String = generate_proof_as_string(size, hex.to_string()).unwrap();
