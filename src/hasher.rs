@@ -118,7 +118,9 @@ mod tests {
             hash: "afbda72bc5ca82bc61d800fcc8fdfa4f059d95e58879795863b34525ded88fce".to_string(),
         };
         let is_valid = valid_proof(proof_long, pubkey.clone());
+        assert!(is_valid);
         let is_valid = valid_proof(proof_short, pubkey);
+        assert!(is_valid);
     }
 
     #[test]
