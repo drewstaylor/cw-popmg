@@ -1,6 +1,5 @@
 use cosmwasm_std::StdError;
 use blake2_rfc::blake2b::{Blake2b, Blake2bResult};
-// use recur_fn::{recur_fn, RecurFn};
 use hex::{encode as hex_encode, decode as hex_decode};
 
 #[derive(Debug)]
