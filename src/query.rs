@@ -3,13 +3,12 @@ use cw_storage_plus::Bound;
 
 use crate::state::{all_secret_ids, Secret, SECRETS};
 
-
 // Default and Max page sizes for paginated queries
 const MAX_LIMIT: u32 = 100;
 const DEFAULT_LIMIT: u32 = 10;
 
 pub fn query_secret_ids(
-    deps: Deps, 
+    deps: Deps,
     start_after: Option<String>,
     limit: Option<u32>,
 ) -> StdResult<Vec<String>> {

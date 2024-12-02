@@ -1,6 +1,6 @@
+use cosmwasm_std::{Addr, Uint128};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use cosmwasm_std::{Addr, Uint128};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct InstantiateMsg {
@@ -39,7 +39,5 @@ pub enum QueryMsg {
     },
 
     /// Get details for a specified secret
-    Details {
-        id: String,
-    },
+    Details { id: String },
 }

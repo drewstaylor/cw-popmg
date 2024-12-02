@@ -1,11 +1,9 @@
-use cosmwasm_std::{
-    BankMsg, Coin, CosmosMsg, DepsMut, Env, MessageInfo, Response,
-};
+use cosmwasm_std::{BankMsg, Coin, CosmosMsg, DepsMut, Env, MessageInfo, Response};
 
-use crate::hasher::{generate_proof_as_string};
-use crate::msg::{AddMsg, ProveMsg};
-use crate::state::{CONFIG, Secret, SECRETS};
 use crate::error::ContractError;
+use crate::hasher::generate_proof_as_string;
+use crate::msg::{AddMsg, ProveMsg};
+use crate::state::{Secret, CONFIG, SECRETS};
 
 pub fn execute_prove(
     deps: DepsMut,
@@ -38,7 +36,8 @@ pub fn execute_prove(
 
     // Release rewards (if any)
     let rewards = hash_puzzle.rewards;
-    let rewards_json: String = serde_json_wasm::to_string(&hash_puzzle.rewards).unwrap_or("0".to_string());
+    let rewards_json: String =
+        serde_json_wasm::to_string(&hash_puzzle.rewards).unwrap_or("0".to_string());
 
     let mut resp = Response::new()
         .add_attribute("action", "execute_prove")
@@ -83,7 +82,7 @@ pub fn execute_add_secret(
     check_sent_required_payment_exact(&info.funds, Some(required_payment))?;
 
     let secret = Secret {
-        id: msg.id.clone(), 
+        id: msg.id.clone(),
         secret: msg.secret,
         depth: msg.depth,
         rewards: msg.rewards,

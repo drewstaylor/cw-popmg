@@ -1,12 +1,8 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use cosmwasm_std::{
-    Addr, Order, Storage, StdResult, Uint128,
-};
-use cw_storage_plus::{
-    Bound, Item, Map,
-};
+use cosmwasm_std::{Addr, Order, StdResult, Storage, Uint128};
+use cw_storage_plus::{Bound, Item, Map};
 
 // Admin
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
@@ -17,11 +13,10 @@ pub struct Config {
 }
 pub const CONFIG: Item<Config> = Item::new("config");
 
-
 // Secrets
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct Secret {
-    pub id: String, 
+    pub id: String,
     pub secret: String,
     pub depth: u32,
     pub rewards: Option<Uint128>,

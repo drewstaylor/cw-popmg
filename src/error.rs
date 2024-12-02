@@ -8,7 +8,7 @@ pub enum ContractError {
 
     #[error("Unauthorized")]
     Unauthorized {},
-    
+
     #[error("Invalid input")]
     InvalidInput {},
 
