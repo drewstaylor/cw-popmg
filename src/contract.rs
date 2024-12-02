@@ -13,11 +13,6 @@ use crate::execute::{
 };
 use crate::query::{query_secret_ids, query_details};
 
-// Mainnet
-// pub static DENOM: &str = "aarch";
-// Testnet
-pub static DENOM: &str = "aconst";
-
 // version info for migration info
 const CONTRACT_NAME: &str = "crates.io:popmg";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -32,6 +27,7 @@ pub fn instantiate(
     let state = Config {
         owner: info.sender.clone(),
         nft_contract: msg.cw721.clone(),
+        denom: msg.denom.clone(),
     };
     set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
     CONFIG.save(deps.storage, &state)?;
@@ -39,7 +35,8 @@ pub fn instantiate(
     Ok(Response::new()
         .add_attribute("method", "instantiate")
         .add_attribute("owner", info.sender.to_string())
-        .add_attribute("nft_contract", msg.cw721.to_string()))
+        .add_attribute("nft_contract", msg.cw721.to_string())
+        .add_attribute("denom", msg.denom))
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]

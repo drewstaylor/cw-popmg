@@ -13,6 +13,7 @@ use cw_storage_plus::{
 pub struct Config {
     pub owner: Addr,
     pub nft_contract: Addr,
+    pub denom: String,
 }
 pub const CONFIG: Item<Config> = Item::new("config");
 

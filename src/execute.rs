@@ -2,7 +2,6 @@ use cosmwasm_std::{
     BankMsg, Coin, CosmosMsg, DepsMut, Env, MessageInfo, Response,
 };
 
-use crate::contract::DENOM;
 use crate::hasher::{generate_proof_as_string};
 use crate::msg::{AddMsg, ProveMsg};
 use crate::state::{CONFIG, Secret, SECRETS};
@@ -14,6 +13,7 @@ pub fn execute_prove(
     info: MessageInfo,
     msg: ProveMsg,
 ) -> Result<Response, ContractError> {
+    let config = CONFIG.load(deps.storage)?;
     // Load hash puzzle
     let mut hash_puzzle = SECRETS.load(deps.storage, &msg.id)?;
     if msg.depth >= hash_puzzle.depth {
@@ -36,19 +36,22 @@ pub fn execute_prove(
     SECRETS.remove(deps.storage, &msg.id);
     SECRETS.save(deps.storage, &msg.id, &hash_puzzle)?;
 
+    // Release rewards (if any)
+    let rewards = hash_puzzle.rewards;
+    let rewards_json: String = serde_json_wasm::to_string(&hash_puzzle.rewards).unwrap_or("0".to_string());
+
     let mut resp = Response::new()
         .add_attribute("action", "execute_prove")
         .add_attribute("secret", hash_puzzle.id)
         .add_attribute("prover", info.sender.to_string())
-        .add_attribute("proof", msg.proof);
+        .add_attribute("proof", msg.proof)
+        .add_attribute("rewards", rewards_json);
 
-    // Release rewards (if any)
-    let rewards = hash_puzzle.rewards;
     if let Some(rewards) = rewards {
         let rewards_msg = BankMsg::Send {
             to_address: info.sender.into(),
             amount: ([Coin {
-                denom: DENOM.into(),
+                denom: config.denom,
                 amount: rewards,
             }])
             .to_vec(),
@@ -74,7 +77,7 @@ pub fn execute_add_secret(
 
     // Tx must cover rewards payment
     let required_payment = Coin {
-        denom: DENOM.to_string(),
+        denom: config.denom,
         amount: msg.rewards.unwrap(),
     };
     check_sent_required_payment_exact(&info.funds, Some(required_payment))?;
